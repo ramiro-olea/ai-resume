@@ -419,7 +419,7 @@ body {
 
     .timeline {
         margin-top: 2rem;
-        padding-left: 1rem;
+        padding-left: 0;
     }
 
     .timeline::before {
@@ -432,14 +432,14 @@ body {
     }
 
     .timeline-content {
-        width: calc(100% - 2rem);
-        margin-left: 2rem !important;
+        width: 100% !important;
+        margin-left: 0 !important;
         margin-right: 0 !important;
         padding: 1rem;
     }
 
     .timeline-item:nth-child(odd) .timeline-content {
-        margin-left: 2rem !important;
+        margin-left: 0 !important;
     }
 
     .timeline-item {
