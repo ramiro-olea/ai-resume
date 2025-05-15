@@ -244,59 +244,52 @@ if (animatedName) {
     function typeWriter() {
         if (typing) {
             if (index <= text.length) {
-                // For mobile, wrap text if needed
                 if (isMobile) {
-                    const words = text.substring(0, index).split(' ');
-                    const lastWord = words[words.length - 1];
-                    if (lastWord.length > 15) { // If word is too long for mobile
-                        words[words.length - 1] = lastWord.substring(0, 15) + '\n' + lastWord.substring(15);
-                    }
-                    animatedName.textContent = words.join(' ');
+                    // For mobile, use a simpler animation without word wrapping
+                    animatedName.textContent = text.substring(0, index);
                 } else {
                     animatedName.textContent = text.substring(0, index);
                 }
                 index++;
-                loopTimeout = setTimeout(typeWriter, 90);
+                loopTimeout = setTimeout(typeWriter, isMobile ? 120 : 90); // Slower on mobile
             } else {
                 typing = false;
-                loopTimeout = setTimeout(typeWriter, 1200);
+                loopTimeout = setTimeout(typeWriter, isMobile ? 2000 : 1200); // Longer pause on mobile
             }
         } else {
             if (index >= 0) {
                 if (isMobile) {
-                    const words = text.substring(0, index).split(' ');
-                    const lastWord = words[words.length - 1];
-                    if (lastWord.length > 15) {
-                        words[words.length - 1] = lastWord.substring(0, 15) + '\n' + lastWord.substring(15);
-                    }
-                    animatedName.textContent = words.join(' ');
+                    animatedName.textContent = text.substring(0, index);
                 } else {
                     animatedName.textContent = text.substring(0, index);
                 }
                 index--;
-                loopTimeout = setTimeout(typeWriter, 40);
+                loopTimeout = setTimeout(typeWriter, isMobile ? 60 : 40); // Slower on mobile
             } else {
                 typing = true;
-                loopTimeout = setTimeout(typeWriter, 600);
+                loopTimeout = setTimeout(typeWriter, isMobile ? 1000 : 600); // Longer pause on mobile
             }
         }
     }
 
-    // Update mobile status on resize
-    window.addEventListener('resize', () => {
+    // Update mobile status on resize and handle animation
+    function handleResize() {
+        const wasMobile = isMobile;
         isMobile = window.innerWidth <= 768;
-    });
-
-    // Add blinking caret effect
-    animatedName.style.borderRight = '0.12em solid var(--primary-color)';
-    setInterval(() => {
-        if (animatedName.style.borderRightColor === 'transparent') {
-            animatedName.style.borderRightColor = 'var(--primary-color)';
-        } else {
-            animatedName.style.borderRightColor = 'transparent';
+        
+        // Only restart animation if mobile state changed
+        if (wasMobile !== isMobile) {
+            clearTimeout(loopTimeout);
+            index = 0;
+            typing = true;
+            animatedName.textContent = '';
+            typeWriter();
         }
-    }, 500);
+    }
 
+    window.addEventListener('resize', handleResize);
+
+    // Start the animation
     typeWriter();
 }
 
