@@ -213,35 +213,79 @@ document.head.insertAdjacentHTML('beforeend', `
     </style>
 `);
 
-// Animated name typewriter loop
+// Mobile menu functionality
+const menuToggle = document.querySelector('.menu-toggle');
+const navLinks = document.querySelector('.nav-links');
+
+menuToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('active');
+    menuToggle.querySelector('i').classList.toggle('fa-bars');
+    menuToggle.querySelector('i').classList.toggle('fa-times');
+});
+
+// Close mobile menu when clicking a link
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        navLinks.classList.remove('active');
+        menuToggle.querySelector('i').classList.add('fa-bars');
+        menuToggle.querySelector('i').classList.remove('fa-times');
+    });
+});
+
+// Update animated name for mobile
 const animatedName = document.querySelector('.animated-name');
 if (animatedName) {
     const text = animatedName.getAttribute('data-text') || animatedName.textContent;
     let index = 0;
     let typing = true;
     let loopTimeout;
+    let isMobile = window.innerWidth <= 768;
 
     function typeWriter() {
         if (typing) {
             if (index <= text.length) {
-                animatedName.textContent = text.substring(0, index);
+                // For mobile, wrap text if needed
+                if (isMobile) {
+                    const words = text.substring(0, index).split(' ');
+                    const lastWord = words[words.length - 1];
+                    if (lastWord.length > 15) { // If word is too long for mobile
+                        words[words.length - 1] = lastWord.substring(0, 15) + '\n' + lastWord.substring(15);
+                    }
+                    animatedName.textContent = words.join(' ');
+                } else {
+                    animatedName.textContent = text.substring(0, index);
+                }
                 index++;
                 loopTimeout = setTimeout(typeWriter, 90);
             } else {
                 typing = false;
-                loopTimeout = setTimeout(typeWriter, 1200); // Pause before erasing
+                loopTimeout = setTimeout(typeWriter, 1200);
             }
         } else {
             if (index >= 0) {
-                animatedName.textContent = text.substring(0, index);
+                if (isMobile) {
+                    const words = text.substring(0, index).split(' ');
+                    const lastWord = words[words.length - 1];
+                    if (lastWord.length > 15) {
+                        words[words.length - 1] = lastWord.substring(0, 15) + '\n' + lastWord.substring(15);
+                    }
+                    animatedName.textContent = words.join(' ');
+                } else {
+                    animatedName.textContent = text.substring(0, index);
+                }
                 index--;
                 loopTimeout = setTimeout(typeWriter, 40);
             } else {
                 typing = true;
-                loopTimeout = setTimeout(typeWriter, 600); // Pause before typing again
+                loopTimeout = setTimeout(typeWriter, 600);
             }
         }
     }
+
+    // Update mobile status on resize
+    window.addEventListener('resize', () => {
+        isMobile = window.innerWidth <= 768;
+    });
 
     // Add blinking caret effect
     animatedName.style.borderRight = '0.12em solid var(--primary-color)';
